@@ -6,6 +6,7 @@
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/component_options.hpp"
+#include "ftxui/component/mouse.hpp"
 #include "ftxui/component/screen_interactive.hpp"
 #include "ftxui/dom/elements.hpp"
 #include "ftxui/util/ref.hpp"
@@ -40,8 +41,7 @@ int main() {
 
   auto screen = ScreenInteractive::Fullscreen();
 
-  Component expressionsInput =
-      Input(&expression, " Your expression comes here ");
+  Component expressionsInput = Input(&expression, "");
 
   Component quitButton = Button(
       "X",
