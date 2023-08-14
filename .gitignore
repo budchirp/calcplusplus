@@ -1,0 +1,5 @@
+.cache/
+build/
+cmake_build_*/
+
+compile_commands.json
