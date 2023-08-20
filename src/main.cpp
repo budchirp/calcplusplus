@@ -1,10 +1,8 @@
-#include <cstdlib>
+#include <csignal>
 #include <iostream>
 #include <string>
 
-#include "ftxui/component/captured_mouse.hpp"
 #include "ftxui/component/component.hpp"
-#include "ftxui/component/component_base.hpp"
 #include "ftxui/component/component_options.hpp"
 #include "ftxui/component/mouse.hpp"
 #include "ftxui/component/screen_interactive.hpp"
@@ -16,20 +14,24 @@ using namespace std;
 using namespace ftxui;
 using namespace mu;
 
-string calculate(string expressions) {
+string calculate(string expression) {
   try {
-    Parser parser;
-    parser.SetExpr(expressions);
+    if (!expression.empty()) {
+      Parser parser;
+      parser.SetExpr(expression);
 
-    double num = parser.Eval();
-    string numString = to_string(num);
+      double num = parser.Eval();
+      string numString = to_string(num);
 
-    size_t pos = numString.find_last_not_of('0');
-    if (pos != std::string::npos && numString[pos] == '.') {
-      pos--;
+      size_t pos = numString.find_last_not_of('0');
+      if (pos != std::string::npos && numString[pos] == '.') {
+        pos--;
+      }
+
+      return numString.substr(0, pos + 1);
+    } else {
+      return "";
     }
-
-    return numString.substr(0, pos + 1);
   } catch (Parser::exception_type& e) {
     return e.GetMsg();
   }
@@ -41,19 +43,22 @@ int main() {
 
   auto screen = ScreenInteractive::Fullscreen();
 
-  Component expressionsInput = Input(&expression, "");
+  InputOption expressionsInputOptions = InputOption::Default();
+  expressionsInputOptions.on_enter = [&] {
+    calculated = calculate(expression);
+  };
+  expressionsInputOptions.multiline = false;
+  Component expressionsInput = Input(&expression, "", expressionsInputOptions);
 
   Component quitButton = Button(
-      "X",
-      [&] {
-        screen.ExitLoopClosure();
-        exit(EXIT_SUCCESS);
-      },
-      ButtonOption::Ascii());
+      "X", [&] { screen.Exit(); }, ButtonOption::Ascii());
 
   Component clearButton = Button(" C ", [&] {
     expression = "";
     calculated = "";
+  });
+  Component removeButton = Button(" R ", [&] {
+    if (!expression.empty()) expression.pop_back();
   });
   Component plusButton = Button(" + ", [&] { expression.append("+"); });
   Component minusButton = Button(" - ", [&] { expression.append("-"); });
@@ -75,14 +80,13 @@ int main() {
   Component button1 = Button(" 1 ", [&] { expression.append("1"); });
   Component button0 = Button(" 0 ", [&] { expression.append("0"); });
 
-  Component emptyButton1 = Button("   ", [&] {});
   Component emptyButton2 = Button("   ", [&] {});
   Component emptyButton3 = Button("   ", [&] {});
 
   auto componentTree = Container::Vertical(
       {quitButton, expressionsInput,
        Container::Horizontal(
-           {clearButton, emptyButton1, emptyButton2, dividedByButton}),
+           {clearButton, removeButton, emptyButton2, dividedByButton}),
        Container::Horizontal({button7, button8, button9, timesButton}),
        Container::Horizontal({button4, button5, button6, minusButton}),
        Container::Horizontal({button1, button2, button3, plusButton}),
@@ -97,7 +101,7 @@ int main() {
                    vbox(hbox(
                        hbox(expressionsInput->Render()) | flex | border,
                        hbox(text(" "), text(calculated), text(" ")) | border)),
-                   vbox(hbox(clearButton->Render(), emptyButton1->Render(),
+                   vbox(hbox(clearButton->Render(), removeButton->Render(),
                              emptyButton2->Render(), dividedByButton->Render()),
                         hbox(button7->Render(), button8->Render(),
                              button9->Render(), timesButton->Render()),
