@@ -35,5 +35,5 @@ cmake ../ && make -j$(nproc)
 3. Have fun!
 
 ```sh
-./build/calcplusplus
+./calcplusplus
 ```
