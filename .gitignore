@@ -37,10 +37,6 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
-.idea
-*.iml
-out
-gen
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
@@ -59,7 +55,7 @@ gen
 .idea/**/libraries
 cmake-build-*/
 .idea/**/mongoSettings.xml
-*.iwss
+*.iws
 out/
 .idea_modules/
 atlassian-ide-plugin.xml
@@ -71,3 +67,14 @@ crashlytics-build.properties
 fabric.properties
 .idea/httpRequests
 .idea/caches/build_file_checksums.ser
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Testing
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
