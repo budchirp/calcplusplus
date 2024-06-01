@@ -1,21 +1,40 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.25)
 
-set(EXEC_NAME "calcplusplus")
-project(calcplusplus VERSION 0.1.0)
+project(calcplusplus VERSION 0.1.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-set(ENABLE_SAMPLES OFF)
-set(BUILD_TESTING OFF)
-set(ENABLE_OPENMP OFF)
+add_compile_options(
+  -Wall -Wextra -Wpedantic
+)
+
+file(GLOB HEADERS "include/*.h" "include/*.hpp" "include/*.hh" "include/*.hxx")
+message(STATUS "Found headers: ${HEADERS}")
+file(GLOB SOURCES "src/*.c" "src/*.cpp" "src/*.cc" "src/*.cxx")
+message(STATUS "Found sources: ${SOURCES}")
+
+add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES})
+target_include_directories(${PROJECT_NAME} PRIVATE include)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(FTXUI_DEV_WARNINGS ON)
-  
-  set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG_MODE=1)
+  target_compile_options(${PROJECT_NAME} PRIVATE -Og -g3 -DDEBUG)
+  target_link_options(${PROJECT_NAME} PRIVATE -fsanitize=address)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+  target_compile_options(${PROJECT_NAME} PRIVATE -O3 -march=native -flto -DNDEBUG)
+  target_link_options(${PROJECT_NAME} PRIVATE -flto)
 endif()
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include PREFIX "Header Files" FILES ${HEADERS})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src PREFIX "Source Files" FILES ${SOURCES})
 
 include(FetchContent)
 
@@ -39,30 +58,7 @@ if(NOT muparser_POPULATED)
   add_subdirectory(${muparser_SOURCE_DIR} ${muparser_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 
-file(GLOB HEADERS
-  "include/*.h"
-  "include/*.hh"
-  "include/*.hpp"
-  "include/*.hxx"
-)
-
-file(GLOB SRC
-  "src/*.c"
-  "src/*.cc"
-  "src/*.cpp"
-  "src/*.cxx"
-)
-
-include_directories(include)
-
-add_executable(${EXEC_NAME} ${SRC} ${HEADERS})
-target_include_directories(${EXEC_NAME} PRIVATE ${HEADERS})
-
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  target_link_options(${EXEC_NAME} PRIVATE -fsanitize=address)
-endif()
-
-target_link_libraries(${EXEC_NAME}
+target_link_libraries(${PROJECT_NAME}
   PRIVATE ftxui::screen
   PRIVATE ftxui::dom
   PRIVATE ftxui::component

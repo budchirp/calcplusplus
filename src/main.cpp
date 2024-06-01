@@ -1,4 +1,3 @@
-#include <csignal>
 #include <string>
 
 #include "ftxui/component/component.hpp"
@@ -12,7 +11,7 @@ using namespace std;
 using namespace ftxui;
 using namespace mu;
 
-string calculate(const string& expression) {
+string calculate(const string &expression) {
   try {
     if (!expression.empty()) {
       Parser parser;
@@ -30,7 +29,7 @@ string calculate(const string& expression) {
     } else {
       return "";
     }
-  } catch (Parser::exception_type& e) {
+  } catch (Parser::exception_type &e) {
     return e.GetMsg();
   }
 }
@@ -56,7 +55,8 @@ int main() {
     calculated = "";
   });
   Component removeButton = Button(" R ", [&] {
-    if (!expression.empty()) expression.pop_back();
+    if (!expression.empty())
+      expression.pop_back();
   });
   Component plusButton = Button(" + ", [&] { expression.append("+"); });
   Component minusButton = Button(" - ", [&] { expression.append("-"); });
@@ -96,9 +96,9 @@ int main() {
                hbox(text(" "), bold(text("calc++")), text(" "),
                     filler() | borderEmpty, quitButton->Render()),
                vbox(
-                   vbox(hbox(
-                       hbox(expressionsInput->Render()) | flex | border,
-                       hbox(text(" "), text(calculated), text(" ")) | border)),
+                   vbox(hbox(hbox(expressionsInput->Render()) | flex | border,
+                             hbox(text(" "), text(calculated), text(" ")) |
+                                 border)),
                    vbox(hbox(clearButton->Render(), removeButton->Render(),
                              emptyButton2->Render(), dividedByButton->Render()),
                         hbox(button7->Render(), button8->Render(),
