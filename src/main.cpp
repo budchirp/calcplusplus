@@ -47,8 +47,8 @@ int main() {
   expressionsInputOptions.multiline = false;
   Component expressionsInput = Input(&expression, "", expressionsInputOptions);
 
-  Component quitButton = Button(
-      "X", [&] { screen.Exit(); }, ButtonOption::Ascii());
+  Component quitButton =
+      Button("X", [&] { screen.Exit(); }, ButtonOption::Ascii());
 
   Component clearButton = Button(" C ", [&] {
     expression = "";
