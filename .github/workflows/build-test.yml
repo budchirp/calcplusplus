@@ -20,4 +20,9 @@ jobs:
         run: make -j$(nproc)
 
       - name: Run
-        run: ./calcplusplus
+        run: |
+          ./calcplusplus &
+          PID=$!
+          sleep 5
+          kill -SIGINT $PID
+          wait $PID
